@@ -1,13 +1,11 @@
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import Student from "../../models/student";
 
 export const findAll = async (req, res) => {
   try {
-    const users = await prisma.user.findMany();
+    const students = await Student.find();
     res.json({
       ok: true,
-      data: users,
+      data: students,
     });
   } catch (error) {
     res.json({
@@ -20,11 +18,9 @@ export const findAll = async (req, res) => {
 export const create = async (req, res) => {
   try {
     const { body } = req;
-    const user = await prisma.user.create({
-      data: {
-        ...body,
-      },
-    });
+    const user = new Student(body);
+    user.save();
+
     res.json({
       ok: true,
       data: user,
@@ -36,3 +32,39 @@ export const create = async (req, res) => {
     });
   }
 };
+
+export const update = async (req, res) => {
+  try {
+    const studentId =req.params.id;
+    const studentUpdate = await Student.findByIdAndUpdate(studentId,req.body, {
+      new: true,
+    });
+
+    res.json({
+      ok: true,
+      data: studentUpdate,
+    });
+  } catch (error) {
+    res.json({
+      ok: false,
+      data: error.message,
+    });
+  }
+};
+
+export const remove = async(req,res) => {
+  try{
+      const { id } = req.params;
+      const deleteStudent = await Student.findByIdAndDelete(id)
+      res.json({
+          ok:true,
+          data:"Personaje eliminado"
+      })
+
+  }catch(error){
+      res.json({
+          ok:false,
+          data:error.message
+      });
+  }
+}
